@@ -5,9 +5,9 @@ const env = require('./config/env');
 async function startServer() {
   try {
     await sequelize.authenticate();
-    console.log('Database connection established.');
+    console.log('Koneksi database berhasil.');
     app.listen(env.port, () => {
-      console.log(`SCAP API listening on port ${env.port}.`);
+      console.log(`SCAP API berjalan pada port ${env.port}.`);
     });
   } catch (error) {
     console.error('Unable to start SCAP API:', error);

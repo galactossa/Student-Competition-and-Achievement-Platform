@@ -5,8 +5,16 @@ module.exports = {
     const { DataTypes } = Sequelize;
     const id = { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true };
     const timestamps = {
-      created_at: { type: DataTypes.DATE, allowNull: false },
-      updated_at: { type: DataTypes.DATE, allowNull: false }
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
+      updated_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      }
     };
     const fk = (table, allowNull = false) => ({
       type: DataTypes.INTEGER,
@@ -102,7 +110,11 @@ module.exports = {
         allowNull: false,
         defaultValue: 'draft'
       },
-      registered_at: { type: DataTypes.DATE, allowNull: true },
+      registered_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
       ...timestamps
     });
 
@@ -112,7 +124,11 @@ module.exports = {
       user_id: fk('users'),
       role: { type: DataTypes.ENUM('leader', 'member'), allowNull: false, defaultValue: 'member' },
       status: { type: DataTypes.ENUM('active', 'left', 'removed'), allowNull: false, defaultValue: 'active' },
-      joined_at: { type: DataTypes.DATE, allowNull: false },
+      joined_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
       ...timestamps
     });
     await queryInterface.addConstraint('team_members', {
@@ -144,7 +160,11 @@ module.exports = {
       assigned_by: fk('users'),
       status: { type: DataTypes.ENUM('active', 'ended'), allowNull: false, defaultValue: 'active' },
       notes: { type: DataTypes.TEXT, allowNull: true },
-      assigned_at: { type: DataTypes.DATE, allowNull: false },
+      assigned_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
       ...timestamps
     });
 
