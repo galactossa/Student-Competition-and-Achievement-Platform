@@ -5,5 +5,6 @@ export const publicApi = {
   getPublicCompetitionDetail: (slug) => api.get(`/public/competitions/${encodeURIComponent(slug)}`),
   getPublicCategories: () => api.get('/public/competition-categories'),
   listPublicAchievements: (params) => api.get('/public/achievements', { params }),
+  getPublicAchievement: (id) => api.get(`/public/achievements/${id}`),
   getPublicStats: () => api.get('/public/stats')
 };

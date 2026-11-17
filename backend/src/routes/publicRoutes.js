@@ -6,6 +6,7 @@ const { achievementListQuerySchema } = require('../validators/publicValidator');
 const router = express.Router();
 
 router.get('/achievements', validate(achievementListQuerySchema, 'query'), publicController.listAchievements);
+router.get('/achievements/:id', publicController.getAchievementDetail);
 router.get('/stats', publicController.stats);
 
 module.exports = router;

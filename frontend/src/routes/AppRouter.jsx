@@ -16,6 +16,8 @@ import StudentDashboardPage from '../pages/student/DashboardPage';
 import ExploreCompetitionPage from '../pages/student/ExploreCompetitionPage';
 import StudentCompetitionDetailPage from '../pages/student/CompetitionDetailPage';
 import LandingPage from '../pages/public/LandingPage';
+import Achievement from '../pages/public/AchievementPage';
+import AchievementDetailPage from '../pages/public/AchievementDetailPage';
 import PublicPortfolioPage from '../pages/public/PublicPortfolioPage';
 import StudentRegistrationsPage from '../pages/student/RegistrationsPage';
 import ProtectedRoute from './ProtectedRoute';
@@ -28,6 +30,8 @@ export default function AppRouter() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/competitions" element={<ExploreCompetitionPage />} />
         <Route path="/competitions/:slug" element={<StudentCompetitionDetailPage />} />
+        <Route path="/achievements" element={<Achievement />} />
+        <Route path="/achievements/:id" element={<AchievementDetailPage />} />
         <Route path="/portfolio/:slug" element={<PublicPortfolioPage />} />
       </Route>
       <Route path="/login" element={<LoginPage />} />

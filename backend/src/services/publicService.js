@@ -59,6 +59,52 @@ async function listAchievements(limit = 6) {
   });
 }
 
+async function getAchievementDetail(id) {
+  const item = await Achievement.findOne({
+    // Hanya prestasi terverifikasi yang boleh dilihat publik.
+    where: { id, status: 'verified' },
+    attributes: ['id', 'date', 'level', 'organizer', 'certificate_url'],
+    include: [
+      {
+        model: User,
+        as: 'user',
+        attributes: ['name'],
+        include: [{
+          model: Student,
+          as: 'student',
+          attributes: ['program_studi', 'photo_url']
+        }]
+      },
+      {
+        model: Competition,
+        as: 'competition',
+        attributes: ['name', 'level']
+      },
+      {
+        model: Result,
+        as: 'result',
+        attributes: ['title']
+      }
+    ]
+  });
+
+  if (!item) return null;
+
+  const achievement = plain(item);
+  return {
+    id: achievement.id,
+    student_name: achievement.user?.name || null,
+    program_studi: achievement.user?.student?.program_studi || null,
+    photo_url: achievement.user?.student?.photo_url || null,
+    competition_name: achievement.competition?.name || null,
+    level: achievement.level || achievement.competition?.level || null,
+    result_title: achievement.result?.title || null,
+    organizer: achievement.organizer || null,
+    certificate_url: achievement.certificate_url || null,
+    date: achievement.date
+  };
+}
+
 async function getPublicStats() {
   const [totalCompetitions, totalAchievements, totalStudents] = await Promise.all([
     Competition.count({ where: { status: { [Op.in]: publicCompetitionStatuses } } }),
@@ -73,4 +119,9 @@ async function getPublicStats() {
   };
 }
 
-module.exports = { getPublicStats, listAchievements, publicCompetitionStatuses };
+module.exports = {
+  getPublicStats,
+  listAchievements,
+  getAchievementDetail,
+  publicCompetitionStatuses
+};

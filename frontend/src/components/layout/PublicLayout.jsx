@@ -8,7 +8,7 @@ import { APP_NAME, APP_NAME_SHORT } from '../../utils/constants';
 const publicLinks = [
   { label: 'Home', to: '/' },
   { label: 'Explore Competitions', to: '/competitions' },
-  { label: 'Achievements', to: '/#achievements' }
+  { label: 'Achievements', to: '/achievements' }
 ];
 
 function dashboardPath(role) {
@@ -41,7 +41,7 @@ export default function PublicLayout() {
                 key={label}
                 to={to}
                 end={to === '/'}
-                className={({ isActive }) => `text-sm font-medium transition hover:text-indigo-700 ${isActive && to !== '/#achievements' ? 'text-indigo-700' : 'text-slate-600'}`}
+                className={({ isActive }) => `text-sm font-medium transition hover:text-indigo-700 ${isActive ? 'text-indigo-700' : 'text-slate-600'}`}
               >
                 {label}
               </NavLink>
