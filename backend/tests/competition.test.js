@@ -137,6 +137,15 @@ beforeEach(() => {
     competitions.filter((item) => item.category_id === where?.category_id).length
   ));
   models.CompetitionCategory.findByPk = jest.fn(async (id) => categories.find((item) => item.id === Number(id)) || null);
+  models.CompetitionCategory.findOne = jest.fn(async ({ where }) => {
+    const conditions = where[Op.and];
+    const nameCondition = conditions.find((condition) => condition.logic !== undefined);
+    const excludedId = conditions.find((condition) => condition.id)?.id?.[Op.ne];
+    return categories.find((item) => (
+      item.name.toLowerCase() === nameCondition.logic
+      && item.id !== excludedId
+    )) || null;
+  });
   models.CompetitionCategory.findAll = jest.fn(async ({ attributes } = {}) => (
     attributes
       ? categories.map((category) => Object.fromEntries(attributes.map((key) => [key, category[key]])))
@@ -422,5 +431,19 @@ describe('Competition management API', () => {
     categories.push({ id: 2, name: 'Seni', description: null });
     competitions.push({ id: 1, category_id: 2 });
     await request(app).delete('/api/competition-categories/2').set(authorized()).expect(409);
+  });
+
+  test('checks category name duplicates without case sensitivity and excludes the edited category', async () => {
+    await request(app).post('/api/competition-categories').set(authorized()).send({ name: 'tEKNOLOGI' })
+      .expect(409)
+      .expect(({ body }) => expect(body.message).toBe('Nama kategori sudah digunakan.'));
+
+    await request(app).put('/api/competition-categories/1').set(authorized()).send({ name: 'TEKNOLOGI' })
+      .expect(200);
+
+    categories.push({ id: 2, name: 'Seni', description: null });
+    await request(app).put('/api/competition-categories/2').set(authorized()).send({ name: 'teknologi' })
+      .expect(409)
+      .expect(({ body }) => expect(body.message).toBe('Nama kategori sudah digunakan.'));
   });
 });

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -30,11 +30,15 @@ export default function CategoryListPage() {
   const deletion = useDeleteCategory();
   const [editing, setEditing] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [search, setSearch] = useState('');
   const isReadOnly = !['admin_pka', 'super_admin'].includes(user?.role);
+  const filteredCategories = (query.data || []).filter((category) => (
+    category.name.toLowerCase().includes(search.trim().toLowerCase())
+  ));
 
   async function saveCategory(values) {
     try {
-      if (editing) await update.mutateAsync({ id: editing.id, data: values });
+      if (editing?.id) await update.mutateAsync({ id: editing.id, data: values });
       else await create.mutateAsync(values);
       setEditing(null);
     } catch (error) {
@@ -67,13 +71,22 @@ export default function CategoryListPage() {
         <div><p className="text-sm font-semibold text-indigo-600">Administrasi</p><h1 className="mt-1 text-2xl font-bold">Kategori Kompetisi</h1><p className="mt-2 text-sm text-slate-600">Atur kategori yang digunakan pada kompetisi.</p></div>
         {!isReadOnly && <Button onClick={() => { form.reset({ name: '', description: '' }); setEditing({ id: null, name: '', description: '' }); }}><Plus size={17} /> Tambah Kategori</Button>}
       </header>
+      <div className="max-w-sm">
+        <Input
+          aria-label="Cari kategori berdasarkan nama"
+          placeholder="Cari nama kategori..."
+          icon={<Search />}
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+      </div>
       {query.isPending ? <Spinner label="Memuat kategori..." /> : query.isError
         ? <p role="alert" className="rounded-xl bg-rose-50 p-5 text-rose-700">Kategori tidak dapat dimuat.</p>
         : <Card className="overflow-x-auto !p-0">
           <table className="w-full min-w-[36rem] text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500"><tr>{['Nama', 'Deskripsi', 'Jumlah Kompetisi', 'Aksi'].map((head) => <th key={head} className="px-5 py-3">{head}</th>)}</tr></thead>
             <tbody className="divide-y divide-slate-100">
-              {query.data.map((category) => <tr key={category.id}>
+              {filteredCategories.map((category) => <tr key={category.id}>
                 <td className="px-5 py-4 font-semibold">{category.name}</td>
                 <td className="max-w-md px-5 py-4 text-slate-600">{category.description || '—'}</td>
                 <td className="px-5 py-4">{category.competition_count}</td>
@@ -82,7 +95,9 @@ export default function CategoryListPage() {
                   <Button variant="ghost" size="sm" aria-label={`Hapus ${category.name}`} onClick={() => setDeleteTarget(category)}><Trash2 className="text-rose-600" size={16} /></Button>
                 </div>}</td>
               </tr>)}
-              {!query.data.length && <tr><td className="px-5 py-10 text-center text-slate-500" colSpan="4">Belum ada kategori.</td></tr>}
+              {!filteredCategories.length && <tr><td className="px-5 py-10 text-center text-slate-500" colSpan="4">
+                {search.trim() ? `Kategori dengan nama "${search.trim()}" tidak ditemukan.` : 'Belum ada kategori.'}
+              </td></tr>}
             </tbody>
           </table>
         </Card>}
